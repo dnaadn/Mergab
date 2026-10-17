@@ -160,7 +160,8 @@ public class Configuration {
                                 "/api/v1/ai/early-warnings/{simulationId}",
                                 "/api/v1/zone-walk-path/**",
                                 "/api/v1/facility-access-path/**",
-                                "/api/v1/simulation/continue/{id}")
+                                "/api/v1/simulation/continue/{id}",
+                                "/api/v1/whatsapp/test")
                         .hasAuthority("ORGANIZER")
 
 

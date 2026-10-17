@@ -26,6 +26,7 @@ public class ExpoEventService {
     private final ZoneRepository zoneRepository;
     private final OrganizerRepository organizerRepository;
     private final ZoneConnectionRepository zoneConnectionRepository;
+    private final NotificationService notificationService;
 
     // كل الفعاليات (للأدمن والزوار)
     public List<ExpoEvent> getExpoEvents() {
@@ -74,12 +75,21 @@ public class ExpoEventService {
         oldEvent.setMapY(expoEvent.getMapY());
 
         expoEventRepository.save(oldEvent);
+
+        // WhatsApp: tell visitors inside the expo about the new time
+        notificationService.eventUpdated(oldEvent);
     }
 
     //delete expo event
     public void deleteExpoEvent(Integer id) {
         ExpoEvent expoEvent = getEventById(id);
+        String eventName = expoEvent.getName();
+        String zoneName = expoEvent.getZone().getName();
+
         expoEventRepository.delete(expoEvent);
+
+        // WhatsApp: tell visitors inside the expo the event is cancelled
+        notificationService.eventCancelled(eventName, zoneName);
     }
 
     //change event zone
@@ -97,8 +107,13 @@ public class ExpoEventService {
             throw new ApiException("Event is already assigned to this zone");
         }
 
+        String oldZoneName = expoEvent.getZone().getName();
+
         expoEvent.setZone(zone);
         expoEventRepository.save(expoEvent);
+
+        // WhatsApp: tell visitors inside the expo about the new location
+        notificationService.eventZoneChanged(expoEvent, oldZoneName);
     }
 
     // Get events by zone

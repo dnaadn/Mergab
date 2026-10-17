@@ -3,6 +3,7 @@ package com.example.mergab.Controller;
 import com.example.mergab.Api.ApiResponse;
 import com.example.mergab.DTO.OrganizerDTO;
 import com.example.mergab.Model.User;
+import com.example.mergab.Service.NotificationService;
 import com.example.mergab.Service.OrganizerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrganizerController {
 
     private final OrganizerService organizerService;
+    private final NotificationService notificationService;
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllOrganizers() {
@@ -25,6 +27,7 @@ public class OrganizerController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid OrganizerDTO dto) {
         organizerService.register(dto);
+        notificationService.organizerWelcome(dto.getPhoneNumber(), dto.getFullName());
         return ResponseEntity.status(201).body(new ApiResponse("Organizer registered successfully"));
     }
 

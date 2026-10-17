@@ -23,6 +23,7 @@ public class ZoneVisitService {
     private final ZoneVisitRepository zoneVisitRepository;
     private final VisitorRepository visitorRepository;
     private final ZoneRepository zoneRepository;
+    private final NotificationService notificationService;
 
     // Register visitor entry after scanning their QR code
     @Transactional
@@ -49,11 +50,17 @@ public class ZoneVisitService {
         long currentOccupancy = zoneVisitRepository.countByZone_IdAndCheckOutTimeIsNull(zoneId);
 
         if (currentOccupancy >= zone.getCapacity()) {
+            // WhatsApp: tell the visitor and suggest a less crowded zone
+            notificationService.zoneFullForVisitor(visitor, zone);
             throw new ApiException("Zone is at full capacity");
         }
 
         ZoneVisit visit = new ZoneVisit(null, LocalDateTime.now(), null, false, visitor, zone);
         zoneVisitRepository.save(visit);
+
+        // WhatsApp: confirm entry to the visitor + alert organizers at 80% / full
+        notificationService.visitorCheckedIn(visitor, zone, currentOccupancy + 1);
+        notificationService.checkZoneThresholds(zone, currentOccupancy, currentOccupancy + 1);
     }
 
     // Register visitor exit from the specified zone

@@ -55,7 +55,8 @@ class SimulationServiceTest {
                 simulationSnapshotRepository,
                 zoneRepository,
                 zoneConnectionRepository,
-                expoEventRepository
+                expoEventRepository,
+                mock(com.example.mergab.Service.NotificationService.class)
         );
     }
 

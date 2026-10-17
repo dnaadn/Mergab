@@ -30,6 +30,9 @@ public interface ZoneVisitRepository extends JpaRepository<ZoneVisit, Integer> {
 
     List<ZoneVisit> findByZone_IdAndCheckOutTimeIsNull(Integer zoneId);
 
+    // All visitors currently inside the expo
+    List<ZoneVisit> findByCheckOutTimeIsNull();
+
     @Modifying
     @Query("DELETE FROM ZoneVisit z WHERE z.visitor.id = :visitorId")
     int deleteVisitsByVisitorId(@Param("visitorId") Integer visitorId);

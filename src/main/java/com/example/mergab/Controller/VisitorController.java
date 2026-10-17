@@ -5,6 +5,7 @@ import com.example.mergab.DTO.UpdateVisitorDTO;
 import com.example.mergab.DTO.VisitorDTO;
 import com.example.mergab.Model.User;
 import com.example.mergab.Service.EmailService;
+import com.example.mergab.Service.NotificationService;
 import com.example.mergab.Service.VisitorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class VisitorController {
 
     private final VisitorService visitorService;
     private final EmailService emailService;
+    private final NotificationService notificationService;
 
     @GetMapping("/get-all")
     public ResponseEntity<?> getAllVisitors() {
@@ -32,6 +34,7 @@ public class VisitorController {
 
         // Sent after the visitor is saved successfully (runs in background)
         emailService.sendWelcomeEmail(dto.getEmail(), dto.getFullName(), qrToken);
+        notificationService.visitorWelcome(dto.getPhoneNumber(), dto.getFullName());
 
         return ResponseEntity.status(201).body(new ApiResponse("Visitor registered successfully"));
     }

@@ -26,6 +26,7 @@ public class PasswordResetService {
     private final PasswordResetCodeRepository resetCodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final NotificationService notificationService;
     private final SecureRandom random = new SecureRandom();
 
     @Transactional
@@ -45,6 +46,7 @@ public class PasswordResetService {
                 LocalDateTime.now().plusMinutes(CODE_MINUTES), 0));
 
         emailService.sendResetCode(user.getEmail(), user.getFullName(), code);
+        notificationService.passwordResetCode(user, code);
     }
 
     // dontRollbackOn: عشان عدد المحاولات الغلط ينحفظ حتى لو رمينا خطأ

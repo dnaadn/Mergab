@@ -37,6 +37,7 @@ public class SimulationService {
     private final ZoneRepository zoneRepository;
     private final ZoneConnectionRepository zoneConnectionRepository;
     private final ExpoEventRepository expoEventRepository;
+    private final NotificationService notificationService;
     private final PrayerTimesService prayerTimesService = new PrayerTimesService();
 
     private final CrowdSimulationEngine crowdSimulationEngine = new CrowdSimulationEngine();
@@ -191,6 +192,9 @@ public class SimulationService {
         simulation.setStatus("COMPLETED");
         simulation.setEndDateTime(simulationStart.plusMinutes(simulation.getDurationMinutes()));
         simulationRepository.save(simulation);
+
+        // WhatsApp: send the organizer a summary of the crowded zones
+        notificationService.simulationCompleted(simulation, zones, records);
         return snapshots;
     }
 

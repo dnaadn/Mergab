@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!host || !toggle) return;
 
     const NS = "http://www.w3.org/2000/svg";
-    const WALK_API = "/api/v1/zone-walk-path/get-by-zone/";
+    const WALK_API = "/api/v1/zone-walk-path/get-active-by-zone/";
 
     const state = {
         svg: null,
@@ -196,12 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             results.forEach((result, index) => {
                 const zoneId = String(missing[index].id);
-                state.loadedZoneIds.add(zoneId);
 
                 if (result.status === "fulfilled") {
+                    state.loadedZoneIds.add(zoneId);
+
                     state.walkwaysByZone.set(
                         zoneId,
-                        result.value.filter(path => path?.active !== false)
+                        result.value
                     );
                 } else {
                     console.error(
@@ -209,7 +210,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         zoneId,
                         result.reason
                     );
-                    state.walkwaysByZone.set(zoneId, []);
+
+                    // Don't mark failed requests as loaded.
+                    // Allow retry on the next simulation update.
+                    state.loadedZoneIds.delete(zoneId);
+                    state.walkwaysByZone.delete(zoneId);
                 }
             });
 
